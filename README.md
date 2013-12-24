@@ -9,7 +9,7 @@ Install
 
 Clone the repo to a destination of your choice:
 ```
-git clone
+git clone git@github.com:WarpcoreLabs/eps.git
 ```
 
 Install the dependencies:
