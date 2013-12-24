@@ -1,0 +1,39 @@
+{
+    "name":        "eps",
+    "version":     "0.1.0",
+    "private":     true,
+    "description": "The EPS framework",
+    "author":      "Joseph Moniz <joseph.moniz@gmail.com>",
+    "main":        "./src/main.js",
+    "scripts": {
+        "start": "node ./src/main.js",
+        "test": "./node_modules/.bin/mocha --recursive"
+    },
+    "dependencies": {
+        "rx":                    "2.2.9",
+        "rx-http-server":        "0.1.1",
+        "rx-router":             "0.2.2",
+        "rx-request-handler":    "0.1.4",
+        "rx-service-manager":    "0.1.0",
+        "rx-config":             "0.1.0",
+        "rx-directory":          "0.1.2",
+        "rx-map":                "0.1.1",
+        "existence":             "1.0.3",
+        "functional-validation": "1.0.3",
+        "functional-form":       "0.1.2",
+        "header":                "0.1.1",
+        "responses":             "0.1.0",
+        "indigenous":            "1.0.0",
+        "filed":                 "0.1.0",
+        "less":                  "1.5.0",
+        "lodash":                "2.2.1",
+        "jade":                  "0.35.0",
+        "cookie":                "0.1.0",
+        "cookie-signature":      "1.0.1",
+        "color-terminal":        "0.0.3-4",
+        "lver-cmp":              "0.1.1"
+    },
+    "devDependencies": {
+        "mocha": "1.9.0"
+    }
+}
