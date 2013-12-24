@@ -94,7 +94,7 @@ by another optional and custom `postAction` pipeline.
 A simple example that makes sure a user is unauthenticated and grabs the
 template service in the `preAction` pipeline and does etag cache checking
 in the `postAction` pipeline would look something like this:
-```
+```javascript
 var Rx              = require("rx");
 var handler         = require("rx-request-handler");
 var OkResponse      = require("responses/response/ok");
