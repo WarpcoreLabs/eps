@@ -1,7 +1,6 @@
 {
     "name":        "eps",
     "version":     "0.1.0",
-    "private":     true,
     "description": "The EPS framework",
     "author":      "Joseph Moniz <joseph.moniz@gmail.com>",
     "main":        "./src/main.js",
