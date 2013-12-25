@@ -31,18 +31,18 @@ EPS is part framework part lego kit. It gives you lots of powerful components
 to snap together and you can choose to create or replace whatever components
 you see fit.
 
-A basic setup starts with a master process spawning, monitoring and reviving
-worker processes. The worker processes spin up HTTP servers and compose
-a set of request handling components together known as `root middleware`.
-At the end of the `root middleware` composition there is a responseConsumer
-subscribed too it that takes responses and sends them to the client.
+A basic setup creates an `eps conduit` from a function that takes a
+`RxHttpServer` and applies a series of `root middleware` to the `requests`
+observable returning final composition. A conduit will internally and
+automatically spin off and manage 1 worker node per CPU core. If a worker
+dies for whatever reason the master process will spawn a new one.
 
 This basic setup typically lives in your src/main.js file and will look
 something like the following:
 ```javascript
-var cluster             = require("cluster");
-var os                  = require("os");
-var RxHttpServer        = require("rx-http-server");
+var path                = require("path");
+var eps                 = require("eps");
+var serviceContainer    = require("./services/container");
 var requestLogger       = require("./middleware/root/request-logger");
 var less                = require("./middleware/root/less");
 var staticFiles         = require("./middleware/root/static-files");
@@ -54,22 +54,13 @@ var flashSessionWriter  = require("./middleware/root/flash-session/writer");
 var signedSessionReader = require("./middleware/root/signed-session/reader");
 var signedSessionWriter = require("./middleware/root/signed-session/writer");
 var router              = require("./middleware/root/router");
+var WorkerOnlineAction  = require("./models/actions/worker/online");
+var WorkerDiedAction    = require("./models/actions/worker/died");
 
-var cpus       = os.cpus().length;
-var server     = new RxHttpServer();
-var lessPath   = path.join(__dirname, "public/css/main.less");
-var publicPath = path.join(__dirname, "public");
-
-if (cluster.isMaster) {
-    for (var i = 0; i < cpus; i++) {
-        cluster.fork();
-    }
-    cluster.on("exit", function(worker, code, signal) {
-        logger.error(new WorkerDiedAction(worker));
-        cluster.fork();
-    });
-} else {
-    server
+var conduit = eps(function(server) {
+    var lessPath   = path.join(__dirname, "public/css/main.less");
+    var publicPath = path.join(__dirname, "public");
+    return server
         .requests
         .flatMap(services)
         .flatMap(requestLogger)
@@ -81,10 +72,22 @@ if (cluster.isMaster) {
         .flatMap(router)
         .flatMap(signedSessionWriter("Why is a raven like a writing desk?"))
         .flatMap(flashSessionWriter)
-        .flatMap(cookieWriter)
-        .subscribe(responseConsumer);
-    server.listen(3000);
-}
+        .flatMap(cookieWriter);
+});
+
+conduit.workerUp.subscribe(function(cluster) {
+    serviceContainer("logger").subscribe(function(logger) {
+        logger.info(new WorkerOnlineAction(cluster));
+    });
+});
+
+conduit.workerDown.subscribe(function(data) {
+    serviceContainer("logger").subscribe(function(logger) {
+        logger.error(new WorkerDiedAction(data.worker));
+    });
+});
+
+conduit.listen(3000);
 ```
 
 Likewise, each controller is a composition of components. The actual controller
