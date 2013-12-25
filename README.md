@@ -33,7 +33,7 @@ you see fit.
 
 A basic setup creates an `eps conduit` from a function that takes a
 `RxHttpServer` and applies a series of `root middleware` to the `requests`
-observable returning final composition. A conduit will internally and
+observable returning the final composition. A conduit will internally and
 automatically spin off and manage 1 worker node per CPU core. If a worker
 dies for whatever reason the master process will spawn a new one.
 
